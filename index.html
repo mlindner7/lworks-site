@@ -517,45 +517,14 @@ footer{
         </div>
       </div>
 
-      <!-- BOOKING FORM -->
-      <div class="estimate-box" id="booking-form" style="display:none;margin-top:1.5rem;border-color:rgba(27,191,170,.35)">
+      <!-- BOOKING FORM - CALENDLY EMBED -->
+      <div class="estimate-box" id="booking-form" style="display:none;margin-top:1.5rem;border-color:rgba(27,191,170,.35);padding:1.5rem">
         <div style="margin-bottom:1.25rem">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--teal-bright);margin-bottom:.3rem">Book Your Job</div>
-          <p style="color:rgba(255,255,255,.6);font-size:.875rem">Fill in your details and we'll confirm your booking shortly.</p>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--teal-bright);margin-bottom:.3rem">Book Your Appointment</div>
+          <p style="color:rgba(255,255,255,.6);font-size:.875rem">Pick a date and time that works for you — we'll take it from there.</p>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-          <div>
-            <span class="est-label">Your Name</span>
-            <input id="book-name" type="text" placeholder="John Smith" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:inherit;font-size:.9rem;padding:.7rem;outline:none">
-          </div>
-          <div>
-            <span class="est-label">Phone Number</span>
-            <input id="book-phone" type="tel" placeholder="(262) 000-0000" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:inherit;font-size:.9rem;padding:.7rem;outline:none">
-          </div>
-        </div>
-        <div style="margin-bottom:1rem">
-          <span class="est-label">Service Address</span>
-          <input id="book-address" type="text" placeholder="123 Main St, Sussex, WI" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:inherit;font-size:.9rem;padding:.7rem;outline:none">
-        </div>
-        <div style="margin-bottom:1rem">
-          <span class="est-label">Preferred Date &amp; Time</span>
-          <input id="book-date" type="text" placeholder="e.g. Saturday morning, May 10th" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:inherit;font-size:.9rem;padding:.7rem;outline:none">
-        </div>
-        <div style="margin-bottom:1.25rem">
-          <span class="est-label">Any Additional Notes</span>
-          <textarea id="book-notes" placeholder="Gate code, parking info, anything else we should know..." style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:inherit;font-size:.9rem;padding:.7rem;resize:vertical;min-height:70px;outline:none"></textarea>
-        </div>
-        <div class="est-error" id="book-error"></div>
-        <button class="submit-btn" id="book-submit-btn" onclick="submitBooking()">Send Booking Request →</button>
-        <div class="est-loading" id="book-loading" style="display:none">
-          <div class="est-spinner"></div>
-          <p>Sending your booking request...</p>
-        </div>
-        <div id="book-success" style="display:none;text-align:center;padding:2rem 1rem">
-          <div style="font-size:2.5rem;margin-bottom:.75rem">✅</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--teal-bright);margin-bottom:.5rem">Booking Request Sent!</div>
-          <p style="color:rgba(255,255,255,.65);font-size:.9rem;line-height:1.6">We'll be in touch shortly to confirm your appointment. You can also reach us directly at <a href="tel:2622251191" style="color:var(--teal-bright)">(262) 225-1191</a>.</p>
-        </div>
+        <div class="calendly-inline-widget" data-url="https://calendly.com/mlindner7-lworksservices?hide_gdpr_banner=1&background_color=0a1628&text_color=ffffff&primary_color=1bbfaa" style="min-width:320px;height:700px;border-radius:12px;overflow:hidden"></div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
       </div>
     </div>
   </div>
@@ -652,9 +621,9 @@ async function getEstimate() {
   });
   parts.push({ type:'text', text:`You are a pricing assistant for LWorks Multi Service Hub in the Sussex/Lisbon/Lake Country, WI area. Services: ${selectedServices.join(', ')}. Notes: "${notes||'none'}". ${uploadedImages.length?`${uploadedImages.length} photo(s) provided — assess size and complexity from them.`:''} Give a realistic Wisconsin-market price estimate. Bundle discount for multiple services. Respond ONLY with JSON: {"range":"$X – $Y","detail":"2-3 sentences","caveats":"one sentence"}. No markdown, no preamble.` });
   try {
-    const resp = await fetch('/.netlify/functions/estimate', {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:400, messages:[{role:'user',content:parts}] })
+      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:parts}] })
     });
     const data = await resp.json();
     const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
