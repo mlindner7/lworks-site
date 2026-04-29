@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -621,7 +622,7 @@ async function getEstimate() {
   });
   parts.push({ type:'text', text:`You are a pricing assistant for LWorks Multi Service Hub in the Sussex/Lisbon/Lake Country, WI area. Services: ${selectedServices.join(', ')}. Notes: "${notes||'none'}". ${uploadedImages.length?`${uploadedImages.length} photo(s) provided — assess size and complexity from them.`:''} Give a realistic Wisconsin-market price estimate. Bundle discount for multiple services. Respond ONLY with JSON: {"range":"$X – $Y","detail":"2-3 sentences","caveats":"one sentence"}. No markdown, no preamble.` });
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('/.netlify/functions/estimate', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:parts}] })
     });
