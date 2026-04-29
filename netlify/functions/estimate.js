@@ -18,12 +18,24 @@ exports.handler = async function(event) {
 
     const data = await response.json();
 
+    console.log('Anthropic status:', response.status);
+    console.log('Anthropic response:', JSON.stringify(data).substring(0, 500));
+
+    if (!response.ok) {
+      return {
+        statusCode: response.status,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: data.error || 'API error', status: response.status })
+      };
+    }
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     };
   } catch (err) {
+    console.log('Function error:', err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
