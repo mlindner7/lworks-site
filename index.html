@@ -624,7 +624,7 @@ async function getEstimate() {
   try {
     const resp = await fetch('/.netlify/functions/estimate', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:parts}] })
+      body: JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:400, messages:[{role:'user',content:parts}] })
     });
     const data = await resp.json();
     const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
