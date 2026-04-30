@@ -670,7 +670,37 @@ async function showBookingForm() {
   const estimateRange = document.getElementById('result-range').textContent;
   const estimateDetail = document.getElementById('result-detail').textContent;
 
-  // Send email immediately when customer accepts estimate
+  // Determine which Calendly event type to show based on selected services
+  const exteriorServices = ['Window Cleaning','Screen Cleaning','Glass Door Cleaning','Trim Cleaning','Gutter Cleaning'];
+  const lawnServices = ['Lawn Mowing','Trimming & Edging','Leaf & Debris Blowout','Bush & Shrub Pruning','Lawn Cleanup','Light Tree Trimming','Plant Watering'];
+  const autoServices = ['Oil Change','Disc Brake Service','Interior Detailing'];
+
+  const hasExterior = selectedServices.some(s => exteriorServices.includes(s));
+  const hasLawn = selectedServices.some(s => lawnServices.includes(s));
+  const hasAuto = selectedServices.some(s => autoServices.includes(s));
+  const categoryCount = [hasExterior, hasLawn, hasAuto].filter(Boolean).length;
+
+  let calendlySlug = '30min'; // default window cleaning
+  if (categoryCount > 1) {
+    calendlySlug = 'hauling-other-services';
+  } else if (hasLawn) {
+    calendlySlug = 'lawn-care-services';
+  } else if (hasAuto) {
+    calendlySlug = 'auto-service-appointment';
+  }
+
+  const calendlyParams = '?hide_gdpr_banner=1&background_color=0a1628&text_color=ffffff&primary_color=1bbfaa';
+  const calendlyUrl = `https://calendly.com/mlindner7-lworksservices/${calendlySlug}${calendlyParams}`;
+
+  // Update Calendly widget URL
+  const widget = document.querySelector('.calendly-inline-widget');
+  widget.setAttribute('data-url', calendlyUrl);
+  widget.innerHTML = '';
+  if (window.Calendly) {
+    window.Calendly.initInlineWidget({ url: calendlyUrl, parentElement: widget });
+  }
+
+  // Send email immediately
   try {
     await emailjs.send('service_6ethcqb', 'template_xzp8oj7', {
       customer_name: 'Booking in progress',
