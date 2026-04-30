@@ -665,63 +665,29 @@ zone.addEventListener('drop', e=>{ e.preventDefault(); zone.style.borderColor=''
 // EmailJS
 emailjs.init('ojcDVPCld5mc6jCXf');
 
-function showBookingForm() {
-  // Generate unique booking ID
-  const bookingId = 'lw_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+async function showBookingForm() {
+  const services = selectedServices.join(', ');
+  const estimateRange = document.getElementById('result-range').textContent;
+  const estimateDetail = document.getElementById('result-detail').textContent;
 
-  // Save estimate details to sessionStorage
-  const estimateData = {
-    bookingId,
-    services: selectedServices.join(', '),
-    estimate_range: document.getElementById('result-range').textContent,
-    detail: document.getElementById('result-detail').textContent,
-    timestamp: new Date().toLocaleString()
-  };
-  sessionStorage.setItem(bookingId, JSON.stringify(estimateData));
-
-  // Update Calendly URL to pass booking ID
-  const calendlyWidget = document.querySelector('.calendly-inline-widget');
-  const baseUrl = 'https://calendly.com/mlindner7-lworksservices?hide_gdpr_banner=1&background_color=0a1628&text_color=ffffff&primary_color=1bbfaa';
-  calendlyWidget.setAttribute('data-url', baseUrl + '&a1=' + encodeURIComponent(bookingId));
-
-  // Re-init Calendly widget with new URL
-  if (window.Calendly) {
-    window.Calendly.initInlineWidget({
-      url: baseUrl + '&a1=' + encodeURIComponent(bookingId),
-      parentElement: calendlyWidget
+  // Send email immediately when customer accepts estimate
+  try {
+    await emailjs.send('service_803x4ve', 'template_xzp8oj7', {
+      customer_name: 'Booking in progress',
+      customer_phone: 'See Calendly notification',
+      customer_address: 'See Calendly notification',
+      preferred_date: 'See Calendly notification',
+      services: services,
+      estimate_range: estimateRange,
+      job_notes: estimateDetail
     });
+  } catch(err) {
+    console.error('Email failed:', err);
   }
 
   document.getElementById('booking-form').style.display = 'block';
   document.getElementById('booking-form').scrollIntoView({behavior:'smooth', block:'center'});
 }
-
-// Listen for Calendly booking completed event
-window.addEventListener('message', async function(e) {
-  if (e.data.event && e.data.event === 'calendly.event_scheduled') {
-    // Get booking ID from sessionStorage (most recent)
-    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('lw_'));
-    if (!keys.length) return;
-    const latestKey = keys.sort().pop();
-    const estimateData = JSON.parse(sessionStorage.getItem(latestKey));
-
-    // Send email via EmailJS
-    try {
-      await emailjs.send('service_803x4ve', 'template_xzp8oj7', {
-        customer_name: e.data.payload?.invitee?.name || 'Customer',
-        customer_phone: 'Via Calendly',
-        customer_address: 'Via Calendly',
-        preferred_date: e.data.payload?.event?.start_time || 'See Calendly',
-        services: estimateData.services,
-        estimate_range: estimateData.estimate_range,
-        job_notes: estimateData.detail
-      });
-      sessionStorage.removeItem(latestKey);
-    } catch(err) {
-      console.error('Email failed:', err);
-    }
-  }
-});
 
 
 </script>
