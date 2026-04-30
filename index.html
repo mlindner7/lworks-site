@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -665,53 +666,64 @@ zone.addEventListener('drop', e=>{ e.preventDefault(); zone.style.borderColor=''
 emailjs.init('ojcDVPCld5mc6jCXf');
 
 function showBookingForm() {
+  // Generate unique booking ID
+  const bookingId = 'lw_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+
+  // Save estimate details to sessionStorage
+  const estimateData = {
+    bookingId,
+    services: selectedServices.join(', '),
+    estimate_range: document.getElementById('result-range').textContent,
+    detail: document.getElementById('result-detail').textContent,
+    timestamp: new Date().toLocaleString()
+  };
+  sessionStorage.setItem(bookingId, JSON.stringify(estimateData));
+
+  // Update Calendly URL to pass booking ID
+  const calendlyWidget = document.querySelector('.calendly-inline-widget');
+  const baseUrl = 'https://calendly.com/mlindner7-lworksservices?hide_gdpr_banner=1&background_color=0a1628&text_color=ffffff&primary_color=1bbfaa';
+  calendlyWidget.setAttribute('data-url', baseUrl + '&a1=' + encodeURIComponent(bookingId));
+
+  // Re-init Calendly widget with new URL
+  if (window.Calendly) {
+    window.Calendly.initInlineWidget({
+      url: baseUrl + '&a1=' + encodeURIComponent(bookingId),
+      parentElement: calendlyWidget
+    });
+  }
+
   document.getElementById('booking-form').style.display = 'block';
   document.getElementById('booking-form').scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-async function submitBooking() {
-  const name = document.getElementById('book-name').value.trim();
-  const phone = document.getElementById('book-phone').value.trim();
-  const address = document.getElementById('book-address').value.trim();
-  const date = document.getElementById('book-date').value.trim();
-  const notes = document.getElementById('book-notes').value.trim();
-  const err = document.getElementById('book-error');
+// Listen for Calendly booking completed event
+window.addEventListener('message', async function(e) {
+  if (e.data.event && e.data.event === 'calendly.event_scheduled') {
+    // Get booking ID from sessionStorage (most recent)
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('lw_'));
+    if (!keys.length) return;
+    const latestKey = keys.sort().pop();
+    const estimateData = JSON.parse(sessionStorage.getItem(latestKey));
 
-  if (!name || !phone || !address || !date) {
-    err.textContent = 'Please fill in your name, phone, address, and preferred date.';
-    err.style.display = 'block';
-    return;
+    // Send email via EmailJS
+    try {
+      await emailjs.send('service_803x4ve', 'template_xzp8oj7', {
+        customer_name: e.data.payload?.invitee?.name || 'Customer',
+        customer_phone: 'Via Calendly',
+        customer_address: 'Via Calendly',
+        preferred_date: e.data.payload?.event?.start_time || 'See Calendly',
+        services: estimateData.services,
+        estimate_range: estimateData.estimate_range,
+        job_notes: estimateData.detail
+      });
+      sessionStorage.removeItem(latestKey);
+    } catch(err) {
+      console.error('Email failed:', err);
+    }
   }
-  err.style.display = 'none';
-  document.getElementById('book-submit-btn').style.display = 'none';
-  document.getElementById('book-loading').style.display = 'block';
+});
 
-  const estimateRange = document.getElementById('result-range').textContent;
-  const estimateDetail = document.getElementById('result-detail').textContent;
 
-  const templateParams = {
-    customer_name: name,
-    customer_phone: phone,
-    customer_address: address,
-    preferred_date: date,
-    services: selectedServices.join(', '),
-    estimate_range: estimateRange,
-    estimate_detail: estimateDetail,
-    job_notes: notes || 'None',
-    message: `New booking request from ${name}\n\nPhone: ${phone}\nAddress: ${address}\nPreferred Date: ${date}\nServices: ${selectedServices.join(', ')}\nEstimate: ${estimateRange}\nJob Notes: ${notes || 'None'}\n\n${estimateDetail}`
-  };
-
-  try {
-    await emailjs.send('service_ztz1o5a', 'template_xzp8oj7', templateParams);
-    document.getElementById('book-loading').style.display = 'none';
-    document.getElementById('book-success').style.display = 'block';
-  } catch(e) {
-    document.getElementById('book-loading').style.display = 'none';
-    document.getElementById('book-submit-btn').style.display = 'block';
-    err.textContent = 'Something went wrong sending your request. Please call or text us at (262) 225-1191.';
-    err.style.display = 'block';
-  }
-}
 </script>
 </body>
 </html>
