@@ -709,7 +709,7 @@ async function showBookingForm() {
   const hasAuto = selectedServices.some(s => autoServices.includes(s));
   const categoryCount = [hasExterior, hasLawn, hasAuto].filter(Boolean).length;
 
-  let calendlySlug = '30min'; // default window cleaning
+  let calendlySlug = 'window-cleaning-services'; // default exterior
   if (categoryCount > 1) {
     calendlySlug = 'hauling-other-services';
   } else if (hasLawn) {
