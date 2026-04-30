@@ -235,17 +235,26 @@ section{padding:5rem 1.5rem}
   border-radius:16px;padding:2rem
 }
 .est-services{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.5rem}
+.est-category{margin-bottom:1.25rem}
+.est-category-label{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;display:block;padding:.25rem .75rem;border-radius:20px;display:inline-block}
+.cat-exterior .est-category-label{background:rgba(56,189,248,.15);color:#38bdf8}
+.cat-lawn .est-category-label{background:rgba(74,222,128,.15);color:#4ade80}
+.cat-auto .est-category-label{background:rgba(167,139,250,.15);color:#a78bfa}
+.cat-additional .est-category-label{background:rgba(251,146,60,.15);color:#fb923c}
 .est-btn{
   background:rgba(255,255,255,.07);
   border:1px solid rgba(255,255,255,.18);
   color:rgba(255,255,255,.82);padding:.5rem 1rem;border-radius:8px;
   font-size:.875rem;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit
 }
-.est-btn:hover{background:rgba(27,191,170,.15);border-color:var(--teal)}
-.est-btn.active{
-  background:linear-gradient(135deg,var(--green),var(--teal));
-  border-color:transparent;color:#fff
-}
+.cat-exterior .est-btn:hover{background:rgba(56,189,248,.15);border-color:#38bdf8}
+.cat-exterior .est-btn.active{background:rgba(56,189,248,.25);border-color:#38bdf8;color:#fff}
+.cat-lawn .est-btn:hover{background:rgba(74,222,128,.15);border-color:#4ade80}
+.cat-lawn .est-btn.active{background:rgba(74,222,128,.25);border-color:#4ade80;color:#fff}
+.cat-auto .est-btn:hover{background:rgba(167,139,250,.15);border-color:#a78bfa}
+.cat-auto .est-btn.active{background:rgba(167,139,250,.25);border-color:#a78bfa;color:#fff}
+.cat-additional .est-btn:hover{background:rgba(251,146,60,.15);border-color:#fb923c}
+.cat-additional .est-btn.active{background:rgba(251,146,60,.25);border-color:#fb923c;color:#fff}
 .est-label{font-size:.8rem;color:rgba(255,255,255,.55);font-weight:500;margin-bottom:.5rem;display:block;letter-spacing:.05em}
 .est-textarea{
   width:100%;background:rgba(255,255,255,.06);
@@ -483,19 +492,39 @@ footer{
     <p class="section-sub">Select your services, describe your situation, and add photos if you have them. Our AI gives you a real estimate in seconds.</p>
     <div class="estimate-box">
       <span class="est-label">Select Service(s)</span>
-      <div class="est-services">
-        <button class="est-btn" onclick="toggleService(this)">Window Cleaning</button>
-        <button class="est-btn" onclick="toggleService(this)">Screen Cleaning</button>
-        <button class="est-btn" onclick="toggleService(this)">Gutter Cleaning</button>
-        <button class="est-btn" onclick="toggleService(this)">Lawn Mowing</button>
-        <button class="est-btn" onclick="toggleService(this)">Lawn Trimming</button>
-        <button class="est-btn" onclick="toggleService(this)">Pruning</button>
-        <button class="est-btn" onclick="toggleService(this)">Tree Trimming</button>
-        <button class="est-btn" onclick="toggleService(this)">Oil Change</button>
-        <button class="est-btn" onclick="toggleService(this)">Disc Brakes</button>
-        <button class="est-btn" onclick="toggleService(this)">Interior Detail</button>
-        <button class="est-btn" onclick="toggleService(this)">Carpet Cleaning</button>
-        <button class="est-btn" onclick="toggleService(this)">Local Hauling</button>
+      <div style="margin-bottom:1.5rem">
+        <div class="est-category cat-exterior">
+          <span class="est-category-label">🪟 Exterior Cleaning</span>
+          <div class="est-services">
+            <button class="est-btn" onclick="toggleService(this)">Window Cleaning (Exterior, Single Story)</button>
+            <button class="est-btn" onclick="toggleService(this)">Screen Cleaning</button>
+            <button class="est-btn" onclick="toggleService(this)">Gutter Cleaning</button>
+          </div>
+        </div>
+        <div class="est-category cat-lawn">
+          <span class="est-category-label">🌿 Lawn Care</span>
+          <div class="est-services">
+            <button class="est-btn" onclick="toggleService(this)">Lawn Mowing</button>
+            <button class="est-btn" onclick="toggleService(this)">Lawn Trimming</button>
+            <button class="est-btn" onclick="toggleService(this)">Pruning</button>
+            <button class="est-btn" onclick="toggleService(this)">Tree Trimming</button>
+          </div>
+        </div>
+        <div class="est-category cat-auto">
+          <span class="est-category-label">🚗 Auto Services</span>
+          <div class="est-services">
+            <button class="est-btn" onclick="toggleService(this)">Oil Change</button>
+            <button class="est-btn" onclick="toggleService(this)">Disc Brakes</button>
+            <button class="est-btn" onclick="toggleService(this)">Light Interior Detailing</button>
+          </div>
+        </div>
+        <div class="est-category cat-additional">
+          <span class="est-category-label">📦 Additional Services</span>
+          <div class="est-services">
+            <button class="est-btn" onclick="toggleService(this)">Carpet Cleaning</button>
+            <button class="est-btn" onclick="toggleService(this)">Local Hauling</button>
+          </div>
+        </div>
       </div>
       <span class="est-label">Describe the Job</span>
       <textarea class="est-textarea" id="est-notes" placeholder="e.g. 3-bedroom ranch house, 2-car garage, last cleaned 2 years ago..."></textarea>
@@ -671,9 +700,9 @@ async function showBookingForm() {
   const estimateDetail = document.getElementById('result-detail').textContent;
 
   // Determine which Calendly event type to show based on selected services
-  const exteriorServices = ['Window Cleaning','Screen Cleaning','Glass Door Cleaning','Trim Cleaning','Gutter Cleaning'];
-  const lawnServices = ['Lawn Mowing','Trimming & Edging','Leaf & Debris Blowout','Bush & Shrub Pruning','Lawn Cleanup','Light Tree Trimming','Plant Watering'];
-  const autoServices = ['Oil Change','Disc Brake Service','Interior Detailing'];
+  const exteriorServices = ['Window Cleaning (Exterior, Single Story)','Screen Cleaning','Gutter Cleaning'];
+  const lawnServices = ['Lawn Mowing','Lawn Trimming','Pruning','Tree Trimming'];
+  const autoServices = ['Oil Change','Disc Brakes','Light Interior Detailing'];
 
   const hasExterior = selectedServices.some(s => exteriorServices.includes(s));
   const hasLawn = selectedServices.some(s => lawnServices.includes(s));
