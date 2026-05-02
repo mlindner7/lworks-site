@@ -657,7 +657,7 @@ uploadedImages.forEach(img => {
   try {
     const resp = await fetch('https://lworks-estimate.mlindner7.workers.dev', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ model:'claude-haiku-4-5-20251001-20250514', max_tokens:400, messages:[{role:'user',content:parts}] })
+      body: JSON.stringify({ model:'claude-haiku-4-5-20251001', max_tokens:400, messages:[{role:'user',content:parts}] })
     });
     const data = await resp.json();
     const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
