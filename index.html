@@ -650,10 +650,10 @@ async function getEstimate() {
   document.getElementById('est-loading').style.display = 'block';
   const notes = document.getElementById('est-notes').value;
   const parts = [];
-  uploadedImages.forEach(img => {
-    parts.push({ type:'image', source:{ type:'base64', media_type:img.split(';')[0].split(':')[1], data:img.split(',')[1] } });
-  });
-  parts.push({ type:'text', text:`You are a pricing assistant for LWorks Multi Service Hub in the Sussex/Lisbon/Lake Country, WI area. Services: ${selectedServices.join(', ')}. Notes: "${notes||'none'}". ${uploadedImages.length?`${uploadedImages.length} photo(s) provided — assess size and complexity from them.`:''} Give a realistic Wisconsin-market price estimate. Bundle discount for multiple services. Respond ONLY with JSON: {"range":"$X – $Y","detail":"2-3 sentences","caveats":"one sentence"}. No markdown, no preamble.` });
+parts.push({ type:'text', text:`You are a pricing assistant for LWorks Multi Service Hub in the Sussex/Lisbon/Lake Country, WI area. Services: ${selectedServices.join(', ')}. Notes: "${notes||'none'}". ${uploadedImages.length?`${uploadedImages.length} photo(s) provided — assess size and complexity from them.`:''} Give a realistic Wisconsin-market price estimate. Bundle discount for multiple services. Respond ONLY with JSON: {"range":"$X – $Y","detail":"2-3 sentences","caveats":"one sentence"}. No markdown, no preamble.` });
+uploadedImages.forEach(img => {
+  parts.push({ type:'image', source:{ type:'base64', media_type:img.split(';')[0].split(':')[1], data:img.split(',')[1] } });
+});
   try {
     const resp = await fetch('/.netlify/functions/estimate', {
       method:'POST', headers:{'Content-Type':'application/json'},
